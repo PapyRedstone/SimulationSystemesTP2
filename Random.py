@@ -5,7 +5,7 @@ class Random:
         self.a = a
         self.c = c
         self.m = m
-        self.setSeed(time())
+        self.setSeed(round(time()))
     
     def random(self):
         self.currentNumber = (self.a * self.currentNumber + self.c) % self.m

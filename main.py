@@ -3,8 +3,8 @@
 from Random import *
 
 def main():
-    r = Random(50,10,60)
-    r.setSeed(5)
+    r = Random(591,149,600)
+    #r.setSeed(5)
     for _ in range(5):
         print(r.random())
 
