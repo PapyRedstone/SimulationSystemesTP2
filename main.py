@@ -3,10 +3,12 @@
 from Random import *
 
 def main():
-    r = Random(591,149,600)
+    # congruance lineaire multiplicatif => c=0
+    # a = 166
+    # m = 49 999 is prime
+    r = Random(517 ,0 ,8999)
     #r.setSeed(5)
-    for _ in range(5):
-        print(r.random())
+    r.testKhi2()
 
 if __name__ == "__main__":
     main()
