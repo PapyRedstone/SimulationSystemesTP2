@@ -1,56 +1,21 @@
 #!/usr/bin/python3
 
 from Random import *
-import turtle
 import numpy
 import random
-import math
+import statistics
+import matplotlib.pyplot as plt
 
 r = Random(517 ,0 ,8999)
 scale = 10
 
-def reset(x,y):
-    root = turtle.getscreen()._root
-    turtle.clear()
-    root.withdraw()
-    root.quit()
-
 def getDirection():
     return r.random()%4
 
+def distance(endPoint):
+    return (endPoint[0] - 0)**2 + (endPoint[1] - 0)**2 
 
-def draw(x, y):
-    reset(None, None)
-    root = turtle.getscreen()._root
-    root.state('normal')
-    turtle.speed(0)
-    turtle.goto(x[0]*scale, y[0]*scale)
-    turtle.pendown()
-
-    for i in range(1, len(x)):
-        turtle.goto(x[i]*scale, y[i]*scale)
-
-    turtle.penup()
-    turtle.onscreenclick(reset)
-
-def drawUnique(posList):
-    reset(None, None)
-    root = turtle.getscreen()._root
-    root.state('normal')
-    turtle.speed(0)
-
-    turtle.goto(posList[0][0]*scale, posList[0][0]*scale)
-    turtle.pendown()
-
-    for i in range(1, len(posList)):
-        turtle.goto(posList[i][0]*scale, posList[i][1]*scale)
-
-    turtle.penup()
-    turtle.onscreenclick(reset)
-
-def classique():
-    print("\nNombre de pas de la simulation ?")
-    nSteps = int(input())
+def classique(nSteps):
 
     x = numpy.zeros(nSteps)
     y = numpy.zeros(nSteps)
@@ -70,13 +35,10 @@ def classique():
             x[i] = x[i - 1] 
             y[i] = y[i - 1] - 1
 
-    draw(x, y)
+    return distance((x[-1],y[-1]))
 
             
-def sansRetour():
-    print("\nNombre de pas de la simulation ?")
-    nSteps = int(input())
-
+def sansRetour(nSteps):
     x = numpy.zeros(nSteps)
     y = numpy.zeros(nSteps)
     previous = None
@@ -111,11 +73,9 @@ def sansRetour():
             x[i] = x[i - 1] 
             y[i] = y[i - 1] - 1
 
-    draw(x, y)
+    return distance((x[-1],y[-1]))
 
-def passageUnique():
-    print("\nNombre de pas de la simulation ?")
-    nSteps = int(input())
+def passageUnique(nSteps):
     counter = 0
     positions = []
 
@@ -156,7 +116,7 @@ def passageUnique():
         
         positions.append((x[i], y[i]))
 
-    drawUnique(positions)
+    return distance(positions[-1])
 
 def verifyPosition(nextPos, positions):
     for position in positions:
@@ -165,38 +125,52 @@ def verifyPosition(nextPos, positions):
     
     return True
 
-
 def main():
-    # congruance lineaire multiplicatif => c=0
-    # a = 166
-    # m = 49 999 is prime
-    # r = Random(517 ,0 ,8999)
-    #r.setSeed(5)
-    r.testKhi2()
+    classicRW = {}
+    sRRW = {}
+    pURW = {}
 
-    functions = {
-        "c":classique,
-        "s":sansRetour,
-        "u":passageUnique,
-        "q":exit
-    }
+    nSteps = int(input("Nombre de pas maximal : "))
+    nSimu = int(input("Nombre de simulations par pas : "))
 
-    while True:
-        print("\n\n/!\ --- Pour fermer la fenetre de simulation, cliquer au milieu  à la fin (ne pas fermer via la croix)")
-        print("\nType de marche aléatoire ?")
-        print("\tClassique (c)")
-        print("\tSans-retour (s)")
-        print("\tPassage unique (u)")
-        print("\tQuitter (q)")
+    for i in range(1, nSteps+1):
+        classic = []
+        sR = []
+        pU = []
+        for j in range(0, nSimu):
+            classic.append(classique(i))
+            sR.append(sansRetour(i))
+            pU.append(passageUnique(i))
+            #print(classic)
         
-        choice = input()
-        #choice = "5" #for testing
+        classicRW[i-1] = statistics.mean(classic) 
+        sRRW[i-1] = statistics.mean(sR) 
+        pURW[i-1] = statistics.mean(pU) 
 
-        try:
-            functions[choice]()
-        except KeyError:
-            print("Veuillez choisir une entree correcte")
-        
+    data1 = {"x":[], "y":[]}
+    data2 = {"x":[], "y":[]}
+    data3 = {"x":[], "y":[]}
+    
+    for n, meanSquare in classicRW.items():
+        data1["x"].append(n)
+        data1["y"].append(meanSquare)
+
+    for n, meanSquare in sRRW.items():
+        data2["x"].append(n)
+        data2["y"].append(meanSquare)
+
+    for n, meanSquare in pURW.items():
+        data3["x"].append(n)
+        data3["y"].append(meanSquare)
+
+    plt.plot(data1["x"], data1["y"], label = "Random walks")
+    plt.plot(data2["x"], data2["y"], label = "Nonreversing walks")
+    plt.plot(data3["x"], data3["y"], label = "Self avoiding walks")
+
+    plt.xlabel('Number of steps')
+    plt.ylabel('Mean squared end-to-end displacement')
+    plt.legend()
+    plt.show()
 
 if __name__ == "__main__":
     main()
