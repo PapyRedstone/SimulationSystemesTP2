@@ -5,6 +5,7 @@ class Random:
         self.a = a
         self.c = c
         self.m = m
+        #on definie une seed par defaut: le timestamp courant
         self.setSeed(round(time()))
     
     def random(self):
@@ -16,7 +17,7 @@ class Random:
         self.currentNumber = s
 
     def testKhi2(self):
-        n = 100000 #nombre de tirages
+        n = 1000 #nombre de tirages
         
         data = {
             2:0,
